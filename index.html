@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Frango na Brasa - Cardápio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Frango na Brasa 🍗🔥</h1>
+
+    <form id="orderForm">
+      <div id="menu"></div>
+
+      <h2>Dados do Cliente</h2>
+      <input type="text" id="name" placeholder="Nome completo" required />
+      <input type="tel" id="phone" placeholder="Telefone com DDD" required />
+
+      <h2>Forma de Retirada</h2>
+      <select id="deliveryType" required>
+        <option value="">Selecione</option>
+        <option value="Retirada no local">Retirada no local</option>
+        <option value="Aplicativo (Uber, 99, etc)">Aplicativo (Uber, 99, etc)</option>
+      </select>
+      <input type="text" id="pickupCode" placeholder="Código de coleta (se via app)" />
+
+      <button type="submit">Enviar Pedido no WhatsApp</button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
