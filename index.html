@@ -9,9 +9,20 @@
 <body>
   <div class="container">
     <h1>Frango na Brasa 🍗🔥</h1>
+    <div class="tabs">
+      <button class="tab-button active" data-tab="Carnes">Carnes</button>
+      <button class="tab-button" data-tab="Acompanhamentos">Acompanhamentos</button>
+      <button class="tab-button" data-tab="Sobremesas">Sobremesas</button>
+      <button class="tab-button" data-tab="Bebidas">Bebidas</button>
+    </div>
 
     <form id="orderForm">
-      <div id="menu"></div>
+      <div class="tab-content" id="menu">
+        <div class="tab-panel" data-content="Carnes"></div>
+        <div class="tab-panel" data-content="Acompanhamentos"></div>
+        <div class="tab-panel" data-content="Sobremesas"></div>
+        <div class="tab-panel" data-content="Bebidas"></div>
+      </div>
 
       <h2>Dados do Cliente</h2>
       <input type="text" id="name" placeholder="Nome completo" required />
@@ -28,7 +39,6 @@
       <button type="submit">Enviar Pedido no WhatsApp</button>
     </form>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>

@@ -1,75 +1,99 @@
-const menuItems = [
-  { name: "Costela Bovina Assada", type: "peso" },
-  { name: "Costela Suína Assada", type: "peso" },
-  { name: "Linguiça Assada", type: "unit", price: 12 },
-  { name: "Frango Assado", type: "unit", price: 35 },
-  { name: "Pote Batatas em Conservas", type: "unit", price: 8 },
-  { name: "Pote Farofa Feijão Tropeiro", type: "unit", price: 10 },
-  { name: "Pote Maionese", type: "unit", price: 8 },
-  { name: "Mousse de Maracujá", type: "unit", price: 5 },
-  { name: "Pudim de Coco", type: "unit", price: 6 },
-  { name: "Manjar de Coco", type: "unit", price: 6 },
-  { name: "Refrigerante (lata)", type: "unit", price: 4 },
-  { name: "Cerveja (lata)", type: "unit", price: 5 },
-];
+const produtos = {
+  Carnes: [
+    { nome: "Frango Assado", preco: 50 },
+    { nome: "Costela Bovina Assada (por kg)", preco: 70, peso: true },
+    { nome: "Costela Suína Assada (por kg)", preco: 60, peso: true },
+    { nome: "Linguiça Assada (por kg)", preco: 50, peso: true }
+  ],
+  Acompanhamentos: [
+    { nome: "Pote de Batatas em Conserva", preco: 10 },
+    { nome: "Pote de Farofa Feijão Tropeiro", preco: 10 },
+    { nome: "Pote de Maionese", preco: 10 }
+  ],
+  Sobremesas: [
+    { nome: "Mousse de Maracujá", preco: 15 },
+    { nome: "Pudim de Coco", preco: 15 },
+    { nome: "Manjar de Coco", preco: 15 }
+  ],
+  Bebidas: [
+    { nome: "Coca-Cola 2L", preco: 13 },
+    { nome: "Guaraná 2L", preco: 10 },
+    { nome: "Sukita 2L", preco: 10 },
+    { nome: "Coca-Cola Lata 350ml", preco: 5 },
+    { nome: "Guaraná Lata 350ml", preco: 5 },
+    { nome: "Sukita Lata 350ml", preco: 5 },
+    { nome: "Heineken 269ml", preco: 5 },
+    { nome: "Original 269ml", preco: 5 }
+  ]
+};
 
-const menuDiv = document.getElementById("menu");
-menuItems.forEach((item, index) => {
-  const inputField = item.type === "peso"
-    ? `<input type="number" min="0.1" step="0.1" placeholder="Peso em kg" data-index="${index}" />`
-    : `<input type="number" min="0" step="1" placeholder="Qtd." data-index="${index}" />`;
-
-  const aviso = item.type === "peso" ? `<small>Valor final informado após pesagem</small>` : '';
-
-  menuDiv.innerHTML += `
-    <div>
-      <label><strong>${item.name}</strong></label>
-      ${inputField}
-      ${aviso}
-    </div>
-  `;
+// Exibir os itens no menu por aba
+const menuContainer = document.querySelectorAll(".tab-panel");
+menuContainer.forEach(container => {
+  const categoria = container.dataset.content;
+  produtos[categoria].forEach(produto => {
+    const inputType = produto.peso ? "number" : "checkbox";
+    const label = document.createElement("label");
+    label.className = "menu-item";
+    label.innerHTML = `
+      <input type="${inputType}" 
+             name="${produto.nome}" 
+             data-preco="${produto.preco}" 
+             ${produto.peso ? 'min="0.1" step="0.1" placeholder="kg"' : ""}/>
+      ${produto.nome} - R$${produto.preco}${produto.peso ? " /kg" : ""}
+    `;
+    container.appendChild(label);
+  });
 });
 
-document.getElementById("orderForm").addEventListener("submit", function (e) {
+// Controle de abas
+document.querySelectorAll(".tab-button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    document.querySelectorAll(".tab-panel").forEach(panel => {
+      panel.classList.remove("active");
+      if (panel.dataset.content === button.dataset.tab) {
+        panel.classList.add("active");
+      }
+    });
+  });
+});
+document.querySelector(".tab-panel[data-content='Carnes']").classList.add("active");
+
+// Formulário
+document.getElementById("orderForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const delivery = document.getElementById("deliveryType").value;
-  const code = document.getElementById("pickupCode").value;
-  const inputs = menuDiv.querySelectorAll("input");
+  const nome = document.getElementById("name").value.trim();
+  const telefone = document.getElementById("phone").value.trim();
+  const entrega = document.getElementById("deliveryType").value;
+  const codigo = document.getElementById("pickupCode").value.trim();
 
-  const orderId = "PED" + Date.now().toString().slice(-5);
-  let message = `🧾 *Pedido - Frango na Brasa*\n\n`;
-  message += `*Cliente:* ${name}\n📞 *Telefone:* ${phone}\n📦 *Forma de retirada:* ${delivery}\n`;
-  if (code) message += `🔐 *Código de coleta:* ${code}\n`;
-  message += `🆔 *Código do pedido:* ${orderId}\n\n📋 *Itens do pedido:*\n`;
+  let mensagem = `*Pedido Frango na Brasa*%0A`;
+  mensagem += `*Nome:* ${nome}%0A`;
+  mensagem += `*Telefone:* ${telefone}%0A`;
+  mensagem += `*Itens:*%0A`;
 
-  let hasItem = false;
+  let total = 0;
 
-  inputs.forEach(input => {
-    const value = input.value;
-    const index = input.getAttribute("data-index");
-    const item = menuItems[index];
-
-    if (value && parseFloat(value) > 0) {
-      hasItem = true;
-      if (item.type === "peso") {
-        message += `- ${item.name}: ${value} kg (valor final após pesagem)\n`;
-      } else {
-        message += `- ${item.name}: ${value} un - R$ ${(item.price * value).toFixed(2)}\n`;
-      }
+  document.querySelectorAll(".menu-item input").forEach(input => {
+    const nomeItem = input.name;
+    const preco = parseFloat(input.dataset.preco);
+    if ((input.type === "checkbox" && input.checked) || 
+        (input.type === "number" && parseFloat(input.value) > 0)) {
+      const qtd = input.type === "number" ? parseFloat(input.value) : 1;
+      const precoItem = qtd * preco;
+      mensagem += `- ${nomeItem} ${input.type === "number" ? `(${qtd.toFixed(2)}kg)` : ""} - R$${precoItem.toFixed(2)}%0A`;
+      total += precoItem;
     }
   });
 
-  if (!hasItem) {
-    alert("Adicione ao menos um item ao pedido.");
-    return;
-  }
+  mensagem += `*Entrega:* ${entrega}%0A`;
+  if (codigo) mensagem += `*Código de Coleta:* ${codigo}%0A`;
+  mensagem += `*Valor Estimado:* R$${total.toFixed(2)}%0A`;
 
-  const encodedMessage = encodeURIComponent(message);
-  const whatsappNumber = "5511970565356"; // Substitua pelo número da empresa com DDI, ex: 5598999999999
-  const url = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
+  const url = `https://wa.me/55${telefone}?text=${mensagem}`;
   window.open(url, "_blank");
 });
